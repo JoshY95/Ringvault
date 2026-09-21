@@ -31,8 +31,20 @@ nav { display: grid; gap: 7px; }
 .nav-link.active { color: white; border-color: #3f171c; background: linear-gradient(90deg, rgba(225,29,46,.18), rgba(225,29,46,.03)); }
 .nav-link.active::before { content: ""; display: inline-block; width: 4px; height: 15px; border-radius: 4px; background: var(--red); margin-right: 10px; vertical-align: -2px; }
 .sidebar-footer { margin-top: auto; padding: 16px 8px 0; border-top: 1px solid var(--line); display: grid; gap: 10px; }
+.account-panel { display: flex; align-items: center; gap: 9px; min-width: 0; margin-bottom: 2px; }
+.account-panel > span:last-child { min-width: 0; }
+.account-panel strong, .account-panel small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-panel strong { font-size: 12px; }
+.account-panel small { margin-top: 2px; color: var(--muted); font-size: 10px; }
+.account-avatar { width: 30px; height: 30px; display: grid; place-items: center; flex: 0 0 auto; color: white; border: 1px solid #5f222b; border-radius: 50%; background: #2a1115; font-size: 9px; font-weight: 900; }
 .sync-status { color: var(--muted); font-size: 12px; margin-bottom: 4px; }
 .status-dot { width: 7px; height: 7px; display: inline-block; margin-right: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); }
+.sync-status.local .status-dot { background: #71717a; box-shadow: none; }
+.sync-status.syncing .status-dot { background: #60a5fa; box-shadow: 0 0 8px #60a5fa; animation: pulse 1s infinite; }
+.sync-status.pending .status-dot { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+@keyframes pulse { 50% { opacity: .35; } }
+.account-button { width: 100%; padding: 9px 11px; color: white; border: 1px solid #62242d; border-radius: 9px; background: #301218; cursor: pointer; font-size: 12px; font-weight: 750; }
+.account-button:hover { border-color: var(--red); background: #3b151c; }
 .text-button { appearance: none; padding: 0; border: 0; color: #d4d4d8; background: transparent; text-align: left; cursor: pointer; font-size: 13px; }
 .text-button:hover { color: white; }
 .upload-label input { display: none; }
@@ -113,8 +125,8 @@ select { appearance: none; width: 100%; color: #e4e4e7; background: #151518; bor
 .set-image { position: absolute; right: 16px; top: 16px; width: 74px; height: 96px; border-radius: 8px; opacity: .78; z-index: 1; }
 .set-image:not(.has-image) { display: none; }
 .set-card > :not(.set-image) { position: relative; z-index: 2; }
-.card-dialog { width: min(900px, calc(100vw - 30px)); padding: 0; color: var(--text); border: 1px solid #3c3c42; border-radius: 20px; background: #111114; box-shadow: 0 30px 100px rgba(0,0,0,.7); }
-.card-dialog::backdrop { background: rgba(0,0,0,.75); backdrop-filter: blur(4px); }
+.card-dialog { width: min(900px, calc(100vw - 30px)); max-height: calc(100vh - 30px); padding: 0; overflow: auto; color: var(--text); border: 1px solid #3c3c42; border-radius: 20px; background: #111114; box-shadow: 0 30px 100px rgba(0,0,0,.7); }
+.card-dialog::backdrop, .auth-dialog::backdrop { background: rgba(0,0,0,.75); backdrop-filter: blur(4px); }
 .dialog-close { position: absolute; right: 14px; top: 12px; z-index: 2; width: 35px; height: 35px; color: white; border: 1px solid #3c3c42; border-radius: 50%; background: #1d1d21; cursor: pointer; font-size: 23px; line-height: 1; }
 .dialog-grid { display: grid; grid-template-columns: minmax(260px, .9fr) minmax(300px, 1.1fr); min-height: 500px; }
 .dialog-images { display: flex; align-items: center; justify-content: center; gap: 15px; padding: 45px 28px; background: radial-gradient(circle at 50% 35%, #29292f, #0d0d10 70%); }
@@ -132,6 +144,27 @@ select { appearance: none; width: 100%; color: #e4e4e7; background: #151518; bor
 .image-status.pending { color: #d4d4d8; background: #25252a; }
 .image-credit { color: var(--muted); font-size: 11px; }
 .source-link { display: inline-block; margin-top: 5px; color: #fda4af; font-size: 12px; }
+.collection-details-form { margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--line); }
+.collection-form-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.collection-form-heading strong { font-size: 14px; }
+.collection-form-heading small { color: var(--muted); font-size: 10px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+.collection-details-form label { display: grid; gap: 6px; color: var(--muted); font-size: 10px; }
+.collection-details-form input, .collection-details-form textarea { width: 100%; padding: 9px 10px; color: white; border: 1px solid #34343a; border-radius: 9px; outline: none; background: #18181b; resize: vertical; }
+.collection-details-form select { padding-top: 9px; padding-bottom: 9px; }
+.collection-details-form input:focus, .collection-details-form textarea:focus { border-color: #7b2934; }
+.notes-field { margin-top: 11px; }
+.collection-details-form .secondary-button { width: 100%; margin-top: 12px; }
+.auth-dialog { width: min(470px, calc(100vw - 30px)); padding: 0; color: var(--text); border: 1px solid #3c3c42; border-radius: 20px; background: #111114; box-shadow: 0 30px 100px rgba(0,0,0,.7); }
+.auth-form { padding: 45px 38px 38px; }
+.auth-form h2 { margin: 10px 0 12px; font-size: 31px; letter-spacing: -1px; }
+.auth-form > p:not(.eyebrow):not(.auth-message) { margin: 0 0 26px; color: var(--muted); line-height: 1.55; font-size: 13px; }
+.auth-form label { display: block; margin-bottom: 7px; color: #d4d4d8; font-size: 12px; }
+.auth-form input { width: 100%; padding: 12px 13px; color: white; border: 1px solid #34343a; border-radius: 10px; outline: none; background: #18181b; }
+.auth-form input:focus { border-color: #7b2934; box-shadow: 0 0 0 3px rgba(225,29,46,.1); }
+.auth-form .primary-button { width: 100%; margin-top: 13px; }
+.auth-form .primary-button:disabled { opacity: .65; cursor: wait; }
+.auth-message { min-height: 18px; margin: 14px 0 0; color: #fda4af; font-size: 12px; }
 .empty-state { padding: 65px 24px; text-align: center; color: var(--muted); }
 .empty-state strong { display: block; color: white; margin-bottom: 7px; }
 .load-more { display: block; margin: 18px auto 0; }
@@ -177,6 +210,7 @@ select { appearance: none; width: 100%; color: #e4e4e7; background: #151518; bor
   .dialog-grid { grid-template-columns: 1fr; }
   .dialog-images { min-height: 330px; padding: 38px 20px 24px; }
   .dialog-details { padding: 30px 24px 34px; }
+  .form-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 430px) {
