@@ -1,0 +1,3 @@
+asset_key,asset_type,set_id,card_uid,filename,rights_status,source_type,source_url,rights_holder,permission_reference,photographer_credit
+universe-base-1-front,card_front,2025-topps-universe-wwe,2025-TUWWE-BASE-1,cards/2025-TUWWE-BASE-1/front.webp,pending,publisher,,Topps,AWAITING-WRITTEN-PERMISSION,
+universe-box,sealed_product,2025-topps-universe-wwe,,sets/2025-topps-universe-wwe/sealed-product.webp,pending,publisher,,Topps,AWAITING-WRITTEN-PERMISSION,
