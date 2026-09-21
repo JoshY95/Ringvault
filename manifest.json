@@ -1,0 +1,10 @@
+{
+  "name": "RingVault WWE Card Tracker",
+  "short_name": "RingVault",
+  "description": "Track WWE trading card sets, owned cards and wanted cards.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "icons": []
+}
