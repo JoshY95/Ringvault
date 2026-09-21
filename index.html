@@ -106,11 +106,20 @@
       <button class="dialog-close" id="closeAuthDialog" aria-label="Close sign in">×</button>
       <form class="auth-form" id="authForm">
         <p class="eyebrow">CLOUD SYNC</p>
-        <h2>Take your vault anywhere.</h2>
-        <p>Enter your email and we’ll send a secure sign-in link. Your collection on this device will be merged into your account.</p>
+        <h2>Sign in to your vault.</h2>
+        <p>Use an account to keep your collection synced across devices. Cards saved on this device will be merged into your account.</p>
+        <div class="auth-tabs" role="tablist" aria-label="Account action">
+          <button class="auth-tab active" id="authSignInTab" type="button" role="tab" aria-selected="true">Sign in</button>
+          <button class="auth-tab" id="authSignUpTab" type="button" role="tab" aria-selected="false">Create account</button>
+        </div>
         <label for="authEmail">Email address</label>
         <input id="authEmail" name="email" type="email" autocomplete="email" required placeholder="collector@example.com" />
-        <button class="primary-button" id="authSubmit" type="submit">Email me a sign-in link</button>
+        <label for="authPassword">Password</label>
+        <input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="8" required placeholder="At least 8 characters" />
+        <p class="password-hint" id="passwordHint">Use the password for your RingVault account.</p>
+        <button class="primary-button" id="authSubmit" type="submit">Sign in</button>
+        <div class="auth-divider"><span>or</span></div>
+        <button class="secondary-button auth-magic-button" id="magicLinkButton" type="button">Email me a one-time sign-in link</button>
         <p class="auth-message" id="authMessage" role="status" aria-live="polite"></p>
       </form>
     </dialog>

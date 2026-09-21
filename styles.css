@@ -159,11 +159,19 @@ select { appearance: none; width: 100%; color: #e4e4e7; background: #151518; bor
 .auth-form { padding: 45px 38px 38px; }
 .auth-form h2 { margin: 10px 0 12px; font-size: 31px; letter-spacing: -1px; }
 .auth-form > p:not(.eyebrow):not(.auth-message) { margin: 0 0 26px; color: var(--muted); line-height: 1.55; font-size: 13px; }
+.auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 0 0 22px; padding: 4px; border: 1px solid #2f2f35; border-radius: 11px; background: #0b0b0d; }
+.auth-tab { padding: 9px 10px; color: var(--muted); border: 0; border-radius: 8px; background: transparent; cursor: pointer; font: inherit; font-size: 12px; font-weight: 700; }
+.auth-tab.active { color: white; background: #27272b; box-shadow: 0 2px 8px rgba(0,0,0,.28); }
 .auth-form label { display: block; margin-bottom: 7px; color: #d4d4d8; font-size: 12px; }
-.auth-form input { width: 100%; padding: 12px 13px; color: white; border: 1px solid #34343a; border-radius: 10px; outline: none; background: #18181b; }
+.auth-form input { width: 100%; margin-bottom: 13px; padding: 12px 13px; color: white; border: 1px solid #34343a; border-radius: 10px; outline: none; background: #18181b; }
 .auth-form input:focus { border-color: #7b2934; box-shadow: 0 0 0 3px rgba(225,29,46,.1); }
+.auth-form .password-hint { margin: -4px 0 2px; color: var(--muted); font-size: 11px; }
 .auth-form .primary-button { width: 100%; margin-top: 13px; }
 .auth-form .primary-button:disabled { opacity: .65; cursor: wait; }
+.auth-divider { display: flex; align-items: center; gap: 10px; margin: 17px 0 12px; color: #71717a; font-size: 10px; text-transform: uppercase; }
+.auth-divider::before, .auth-divider::after { content: ""; height: 1px; flex: 1; background: #2f2f35; }
+.auth-magic-button { width: 100%; }
+.auth-magic-button:disabled { opacity: .65; cursor: wait; }
 .auth-message { min-height: 18px; margin: 14px 0 0; color: #fda4af; font-size: 12px; }
 .empty-state { padding: 65px 24px; text-align: center; color: var(--muted); }
 .empty-state strong { display: block; color: white; margin-bottom: 7px; }

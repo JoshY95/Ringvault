@@ -9,7 +9,8 @@ RingVault is a WWE trading card collection tracker built from verified master ca
 - Filter by set, category and collection status
 - Mark cards as owned or wanted
 - See progress by set and across the full catalogue
-- Use the app in local guest mode or sign in by email for cross-device cloud sync
+- Use the app in local guest mode or sign in with email/password for cross-device cloud sync
+- Create test accounts in-app, with one-time email links retained as a backup sign-in method
 - Merge an existing on-device collection into a signed-in account
 - Back up and restore collection data
 - Installable, responsive and available offline after the first visit
@@ -49,3 +50,5 @@ Run `scripts/build_catalogue.py` after placing the completed spreadsheets in the
 ## Authentication setup
 
 The browser uses the public Supabase publishable key in `config.js`; no server secret is shipped to the client. Before production sign-in testing, add every deployed RingVault origin to **Authentication → URL Configuration → Redirect URLs** in the RingVault Sydney Supabase dashboard. Keep localhost entries for local testing and use exact HTTPS deployment URLs in production.
+
+Email/password accounts use Supabase `signUp` and `signInWithPassword`. Hosted projects require email confirmation by default. For closed testing only, confirmation can be temporarily disabled under **Authentication → Providers → Email**. Re-enable confirmation and configure custom SMTP before a public launch.

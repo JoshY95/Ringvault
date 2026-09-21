@@ -2,6 +2,7 @@ const GUEST_STORAGE_KEY = "ringvault.collection.v1";
 const USER_STORAGE_PREFIX = "ringvault.collection.user";
 const PAGE_SIZE = 100;
 const API_PAGE_SIZE = 1000;
+let authMode = "sign-in";
 
 const state = {
   catalogue: null,
@@ -526,6 +527,53 @@ async function sendMagicLink(email) {
   if (error) throw error;
 }
 
+async function signInWithPassword(email, password) {
+  if (!state.supabase) throw new Error("Cloud sync is unavailable right now");
+  const { data, error } = await state.supabase.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+  return data;
+}
+
+async function signUpWithPassword(email, password) {
+  if (!state.supabase) throw new Error("Cloud sync is unavailable right now");
+  const redirect = new URL(location.href);
+  redirect.hash = "";
+  redirect.search = "";
+  const { data, error } = await state.supabase.auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo: redirect.href },
+  });
+  if (error) throw error;
+  return data;
+}
+
+function authErrorMessage(error) {
+  const message = error?.message || "Account access failed. Please try again.";
+  if (/invalid login credentials/i.test(message)) return "Email or password is incorrect.";
+  if (/email not confirmed/i.test(message)) return "Confirm your email before signing in.";
+  if (/rate limit/i.test(message)) return "Email limit reached. Try password sign-in or wait before requesting another email.";
+  return message;
+}
+
+function setAuthMode(mode) {
+  authMode = mode;
+  const signingUp = mode === "sign-up";
+  $("#authSignInTab").classList.toggle("active", !signingUp);
+  $("#authSignInTab").setAttribute("aria-selected", String(!signingUp));
+  $("#authSignUpTab").classList.toggle("active", signingUp);
+  $("#authSignUpTab").setAttribute("aria-selected", String(signingUp));
+  $("#authPassword").autocomplete = signingUp ? "new-password" : "current-password";
+  $("#passwordHint").textContent = signingUp
+    ? "Create a password with at least 8 characters."
+    : "Use the password for your RingVault account.";
+  $("#authSubmit").textContent = signingUp ? "Create account" : "Sign in";
+  $("#authSubmit").disabled = false;
+  $("#magicLinkButton").textContent = "Email me a one-time sign-in link";
+  $("#magicLinkButton").disabled = false;
+  $("#authMessage").textContent = "";
+}
+
 function attachEvents() {
   document.addEventListener("click", (event) => {
     const open = event.target.closest("[data-open-card]");
@@ -561,9 +609,11 @@ function attachEvents() {
   $("#restoreInput").addEventListener("change", (event) => { if (event.target.files[0]) restoreCollection(event.target.files[0]); event.target.value = ""; });
   $("#closeCardDialog").addEventListener("click", () => $("#cardDialog").close());
   $("#cardDialog").addEventListener("click", (event) => { if (event.target === event.currentTarget) event.currentTarget.close(); });
-  $("#authButton").addEventListener("click", () => $("#authDialog").showModal());
+  $("#authButton").addEventListener("click", () => { setAuthMode("sign-in"); $("#authDialog").showModal(); });
   $("#closeAuthDialog").addEventListener("click", () => $("#authDialog").close());
   $("#authDialog").addEventListener("click", (event) => { if (event.target === event.currentTarget) event.currentTarget.close(); });
+  $("#authSignInTab").addEventListener("click", () => setAuthMode("sign-in"));
+  $("#authSignUpTab").addEventListener("click", () => setAuthMode("sign-up"));
   $("#signOutButton").addEventListener("click", async () => {
     const { error } = await state.supabase.auth.signOut();
     if (error) showToast("Sign out failed. Please try again."); else showToast("Signed out · cloud collection stays with your account");
@@ -571,15 +621,48 @@ function attachEvents() {
   $("#authForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     const button = $("#authSubmit");
+    const magicButton = $("#magicLinkButton");
     const message = $("#authMessage");
-    button.disabled = true; message.textContent = "Sending your secure sign-in link…";
+    const email = $("#authEmail").value.trim();
+    const password = $("#authPassword").value;
+    button.disabled = true;
+    magicButton.disabled = true;
+    message.textContent = authMode === "sign-up" ? "Creating your account…" : "Signing you in…";
     try {
-      await sendMagicLink($("#authEmail").value.trim());
+      const data = authMode === "sign-up"
+        ? await signUpWithPassword(email, password)
+        : await signInWithPassword(email, password);
+      if (authMode === "sign-up" && !data.session) {
+        message.textContent = "Account created. Check your email to confirm it before signing in.";
+        button.textContent = "Confirmation required";
+        magicButton.disabled = false;
+      } else {
+        $("#authDialog").close();
+        showToast(authMode === "sign-up" ? "Account created · your vault is syncing" : "Signed in · your vault is syncing");
+      }
+    } catch (error) {
+      message.textContent = authErrorMessage(error);
+      button.disabled = false;
+      magicButton.disabled = false;
+    }
+  });
+  $("#magicLinkButton").addEventListener("click", async () => {
+    const email = $("#authEmail");
+    const button = $("#magicLinkButton");
+    const submit = $("#authSubmit");
+    const message = $("#authMessage");
+    if (!email.reportValidity()) return;
+    button.disabled = true;
+    submit.disabled = true;
+    message.textContent = "Sending your secure sign-in link…";
+    try {
+      await sendMagicLink(email.value.trim());
       message.textContent = "Check your email and open the RingVault sign-in link.";
       button.textContent = "Link sent";
     } catch (error) {
-      message.textContent = error.message || "The sign-in link could not be sent.";
+      message.textContent = authErrorMessage(error);
       button.disabled = false;
+      submit.disabled = false;
     }
   });
   window.addEventListener("online", () => { if (state.user) syncCollection(); });
