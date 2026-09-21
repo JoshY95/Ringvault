@@ -23,7 +23,13 @@
           <a class="nav-link" href="#collection" data-view="collection"><span>My Collection</span></a>
         </nav>
         <div class="sidebar-footer">
-          <div class="sync-status"><span class="status-dot"></span>Saved on this device</div>
+          <div class="account-panel">
+            <span class="account-avatar" aria-hidden="true">RV</span>
+            <span><strong id="accountName">Guest mode</strong><small id="accountNote">Sign in for cloud sync</small></span>
+          </div>
+          <div class="sync-status local" id="syncStatus"><span class="status-dot"></span>Saved on this device</div>
+          <button class="account-button" id="authButton">Sign in to sync</button>
+          <button class="text-button" id="signOutButton" hidden>Sign out</button>
           <button class="text-button" id="backupButton">Back up collection</button>
           <label class="text-button upload-label">Restore backup<input id="restoreInput" type="file" accept="application/json" /></label>
         </div>
@@ -96,7 +102,22 @@
       <div id="cardDialogContent"></div>
     </dialog>
 
+    <dialog class="auth-dialog" id="authDialog">
+      <button class="dialog-close" id="closeAuthDialog" aria-label="Close sign in">×</button>
+      <form class="auth-form" id="authForm">
+        <p class="eyebrow">CLOUD SYNC</p>
+        <h2>Take your vault anywhere.</h2>
+        <p>Enter your email and we’ll send a secure sign-in link. Your collection on this device will be merged into your account.</p>
+        <label for="authEmail">Email address</label>
+        <input id="authEmail" name="email" type="email" autocomplete="email" required placeholder="collector@example.com" />
+        <button class="primary-button" id="authSubmit" type="submit">Email me a sign-in link</button>
+        <p class="auth-message" id="authMessage" role="status" aria-live="polite"></p>
+      </form>
+    </dialog>
+
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.0/dist/umd/supabase.min.js" integrity="sha384-De+l/Df7qym5QBDVocD3+gW1S7IjR3epf+6KbRDjB3FCCzM/LqVTwqckT6FhFar8" crossorigin="anonymous"></script>
     <script src="app.js" defer></script>
   </body>
 </html>
