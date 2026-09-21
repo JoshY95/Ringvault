@@ -1,4 +1,5 @@
 name: Deploy RingVault to GitHub Pages
+# A push to main publishes the current static app.
 
 on:
   workflow_dispatch:
