@@ -3,6 +3,7 @@ const PAGE_SIZE = 100;
 
 const state = {
   catalogue: null,
+  images: { cards: {}, sets: {} },
   collection: loadCollection(),
   view: "dashboard",
   query: "",
@@ -52,10 +53,41 @@ function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[character]);
 }
 
+function safeUrl(value, allowRelative = true) {
+  if (!value) return "";
+  try {
+    const url = new URL(value, location.href);
+    if (!["http:", "https:"].includes(url.protocol)) return "";
+    if (!allowRelative && url.origin === location.origin && !/^https?:/i.test(value)) return "";
+    return url.href;
+  } catch { return ""; }
+}
+
+function approvedImage(entry) {
+  return entry?.rightsStatus === "approved" ? entry : null;
+}
+
+function cardImage(cardId) { return approvedImage(state.images.cards?.[cardId]); }
+function setImage(setId) { return approvedImage(state.images.sets?.[setId]); }
+
+function initials(value) {
+  return String(value || "RV").split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+}
+
+function imageMarkup(entry, alt, fallback, className = "") {
+  const source = safeUrl(entry?.thumbnail || entry?.front || entry?.image);
+  return `<div class="image-frame ${className} ${source ? "has-image" : ""}">
+    <span class="image-fallback" aria-hidden="true">${escapeHtml(fallback)}</span>
+    ${source ? `<img src="${escapeHtml(source)}" alt="${escapeHtml(alt)}" loading="lazy" decoding="async" onerror="this.parentElement.classList.remove('has-image');this.remove()" />` : ""}
+  </div>`;
+}
+
 function setCard(set) {
   const owned = setOwnedCount(set.id);
   const progress = set.cardCount ? Math.round((owned / set.cardCount) * 100) : 0;
+  const image = setImage(set.id);
   return `<article class="set-card" data-set-id="${set.id}" style="--accent:${set.accent}">
+    ${imageMarkup(image, `${set.name} sealed product`, "BOX", "set-image")}
     <span class="set-year">${set.year} · TOPPS</span>
     <h3>${escapeHtml(set.shortName)}</h3>
     <div class="set-meta">${set.cardCount.toLocaleString()} cards · ${set.subsetCount} subsets</div>
@@ -97,8 +129,11 @@ function cardRow(card) {
   const set = state.catalogue.sets.find((item) => item.id === card.setId);
   const status = statusFor(card.id);
   return `<article class="card-row">
+    <button class="card-image-button" data-open-card="${escapeHtml(card.id)}" aria-label="View ${escapeHtml(card.name)}">
+      ${imageMarkup(cardImage(card.id), `${card.name} card`, initials(card.name), "card-thumbnail")}
+    </button>
     <div class="card-number">#${escapeHtml(card.number)}</div>
-    <div class="card-name">${escapeHtml(card.name)}<small>${escapeHtml(card.subset)}${card.rookie === "Yes" ? " · Rookie" : ""}</small></div>
+    <button class="card-name card-name-button" data-open-card="${escapeHtml(card.id)}">${escapeHtml(card.name)}<small>${escapeHtml(card.subset)}${card.rookie === "Yes" ? " · Rookie" : ""}</small></button>
     <div class="card-set">${escapeHtml(set.shortName)}<small>${escapeHtml(card.roster || "WWE")}</small></div>
     <span class="category-pill">${escapeHtml(card.category)}</span>
     <div class="card-actions">
@@ -106,6 +141,38 @@ function cardRow(card) {
       <button class="state-button wanted ${status === "wanted" ? "active" : ""}" data-card-id="${card.id}" data-status="wanted">Wanted</button>
     </div>
   </article>`;
+}
+
+function openCard(cardId) {
+  const card = state.catalogue.cards.find((item) => item.id === cardId);
+  if (!card) return;
+  const set = state.catalogue.sets.find((item) => item.id === card.setId);
+  const entry = cardImage(card.id);
+  const front = safeUrl(entry?.front || entry?.image || entry?.thumbnail);
+  const back = safeUrl(entry?.back);
+  const source = safeUrl(entry?.sourceUrl, false);
+  $("#cardDialogContent").innerHTML = `<div class="dialog-grid">
+    <div class="dialog-images">
+      ${imageMarkup(front ? { front, rightsStatus: "approved" } : null, `${card.name} front`, initials(card.name), "card-preview")}
+      ${back ? imageMarkup({ front: back, rightsStatus: "approved" }, `${card.name} back`, "BACK", "card-preview") : ""}
+    </div>
+    <div class="dialog-details">
+      <p class="eyebrow">${escapeHtml(set.shortName)}</p>
+      <h2>${escapeHtml(card.name)}</h2>
+      <dl>
+        <div><dt>Card number</dt><dd>${escapeHtml(card.number)}</dd></div>
+        <div><dt>Subset</dt><dd>${escapeHtml(card.subset)}</dd></div>
+        <div><dt>Category</dt><dd>${escapeHtml(card.category)}</dd></div>
+        <div><dt>Card UID</dt><dd>${escapeHtml(card.id)}</dd></div>
+      </dl>
+      <p class="image-status ${entry ? "approved" : "pending"}">${entry ? "Approved reference image" : "Reference image not yet added"}</p>
+      ${entry?.photographerCredit ? `<p class="image-credit">Image: ${escapeHtml(entry.photographerCredit)}</p>` : ""}
+      ${source ? `<a class="source-link" href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer">View image source</a>` : ""}
+    </div>
+  </div>`;
+  const dialog = $("#cardDialog");
+  if (typeof dialog.showModal === "function") dialog.showModal();
+  else dialog.setAttribute("open", "");
 }
 
 function renderCards() {
@@ -186,6 +253,8 @@ async function restoreCollection(file) {
 
 function attachEvents() {
   document.addEventListener("click", (event) => {
+    const open = event.target.closest("[data-open-card]");
+    if (open) { openCard(open.dataset.openCard); return; }
     const nav = event.target.closest("[data-view]");
     if (nav) { event.preventDefault(); changeView(nav.dataset.view); return; }
     const go = event.target.closest("[data-go]");
@@ -215,13 +284,19 @@ function attachEvents() {
   $("#loadMore").addEventListener("click", () => { state.visibleCards += PAGE_SIZE; renderCards(); });
   $("#backupButton").addEventListener("click", backupCollection);
   $("#restoreInput").addEventListener("change", (event) => { if (event.target.files[0]) restoreCollection(event.target.files[0]); event.target.value = ""; });
+  $("#closeCardDialog").addEventListener("click", () => $("#cardDialog").close());
+  $("#cardDialog").addEventListener("click", (event) => { if (event.target === event.currentTarget) event.currentTarget.close(); });
 }
 
 async function init() {
   try {
-    const response = await fetch("data/catalogue.json");
-    if (!response.ok) throw new Error("Catalogue failed to load");
-    state.catalogue = await response.json();
+    const [catalogueResponse, imageResponse] = await Promise.all([
+      fetch("data/catalogue.json"),
+      fetch("data/images.json").catch(() => null),
+    ]);
+    if (!catalogueResponse.ok) throw new Error("Catalogue failed to load");
+    state.catalogue = await catalogueResponse.json();
+    if (imageResponse?.ok) state.images = await imageResponse.json();
     populateFilters();
     attachEvents();
     renderAll();
