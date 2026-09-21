@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#09090b" />
+    <meta name="description" content="Track WWE trading card sets, collection progress and wanted cards." />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>RingVault</title>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="#dashboard" aria-label="RingVault dashboard">
+          <span class="brand-mark">RV</span>
+          <span><strong>RingVault</strong><small>WWE card collection</small></span>
+        </a>
+        <nav aria-label="Main navigation">
+          <a class="nav-link active" href="#dashboard" data-view="dashboard"><span>Overview</span></a>
+          <a class="nav-link" href="#sets" data-view="sets"><span>Sets</span></a>
+          <a class="nav-link" href="#cards" data-view="cards"><span>Cards</span></a>
+          <a class="nav-link" href="#collection" data-view="collection"><span>My Collection</span></a>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="sync-status"><span class="status-dot"></span>Saved on this device</div>
+          <button class="text-button" id="backupButton">Back up collection</button>
+          <label class="text-button upload-label">Restore backup<input id="restoreInput" type="file" accept="application/json" /></label>
+        </div>
+      </aside>
+
+      <main>
+        <header class="topbar">
+          <button class="menu-button" id="menuButton" aria-label="Open navigation">☰</button>
+          <div>
+            <p class="eyebrow">COLLECTION TRACKER</p>
+            <h1 id="pageTitle">Overview</h1>
+          </div>
+          <label class="global-search">
+            <span aria-hidden="true">⌕</span>
+            <input id="globalSearch" type="search" placeholder="Search wrestler or card number" autocomplete="off" />
+          </label>
+        </header>
+
+        <div class="content">
+          <section class="view active" id="dashboardView">
+            <div class="hero-panel">
+              <div>
+                <p class="eyebrow">YOUR DIGITAL CARD VAULT</p>
+                <h2>Know what you own.<br /><span>Find what you need.</span></h2>
+                <p>Browse verified WWE checklists and track every card in your collection.</p>
+                <button class="primary-button" data-go="cards">Browse all cards</button>
+              </div>
+              <div class="hero-emblem" aria-hidden="true"><span>RV</span></div>
+            </div>
+            <div class="stat-grid" id="stats"></div>
+            <div class="section-heading">
+              <div><p class="eyebrow">CHECKLISTS</p><h2>Your sets</h2></div>
+              <button class="text-button" data-go="sets">View all sets</button>
+            </div>
+            <div class="set-grid" id="dashboardSets"></div>
+          </section>
+
+          <section class="view" id="setsView">
+            <div class="section-heading">
+              <div><p class="eyebrow">CATALOGUE</p><h2>WWE sets</h2><p class="muted">Verified card identities from the completed master catalogues.</p></div>
+            </div>
+            <div class="set-grid large" id="allSets"></div>
+          </section>
+
+          <section class="view" id="cardsView">
+            <div class="filter-bar">
+              <select id="setFilter" aria-label="Filter by set"><option value="all">All sets</option></select>
+              <select id="categoryFilter" aria-label="Filter by category"><option value="all">All categories</option></select>
+              <select id="statusFilter" aria-label="Filter by collection status">
+                <option value="all">All cards</option><option value="owned">Owned</option><option value="wanted">Wanted</option><option value="missing">Missing</option>
+              </select>
+              <button class="secondary-button" id="clearFilters">Clear filters</button>
+            </div>
+            <div class="results-line"><strong id="resultCount">0 cards</strong><span id="activeSetLabel">Across all sets</span></div>
+            <div class="card-list" id="cardList"></div>
+            <button class="secondary-button load-more" id="loadMore">Load more</button>
+          </section>
+
+          <section class="view" id="collectionView">
+            <div class="collection-summary" id="collectionSummary"></div>
+            <div class="section-heading"><div><p class="eyebrow">OWNED CARDS</p><h2>My collection</h2></div></div>
+            <div class="card-list" id="collectionList"></div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="app.js" defer></script>
+  </body>
+</html>
