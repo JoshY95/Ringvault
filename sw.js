@@ -1,5 +1,5 @@
-const CACHE = "ringvault-v2";
-const ASSETS = ["./", "index.html", "styles.css", "app.js", "manifest.json", "data/catalogue.json", "data/images.json"];
+const CACHE = "ringvault-v3";
+const ASSETS = ["./", "index.html", "styles.css", "config.js", "app.js", "manifest.json", "data/catalogue.json", "data/images.json"];
 
 self.addEventListener("install", (event) => event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS))));
 self.addEventListener("activate", (event) => event.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))))));
