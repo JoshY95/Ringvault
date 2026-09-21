@@ -31,13 +31,37 @@ create unique index if not exists reference_images_one_primary_idx
 
 alter table public.reference_images enable row level security;
 
-create policy "Approved reference images are readable"
-on public.reference_images
-for select
-to anon, authenticated
-using (rights_status = 'approved');
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public'
+      and tablename = 'reference_images'
+      and policyname = 'Approved reference images are readable'
+  ) then
+    create policy "Approved reference images are readable"
+      on public.reference_images
+      for select
+      to anon, authenticated
+      using (rights_status = 'approved');
+  end if;
+end
+$$;
 
 grant select on public.reference_images to anon, authenticated;
 
 comment on table public.reference_images is
   'Provenance and usage approval for RingVault public catalogue images. Uploads are performed only by trusted server-side tooling.';
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'reference-images',
+  'reference-images',
+  true,
+  15728640,
+  array['image/jpeg', 'image/png', 'image/webp']
+)
+on conflict (id) do update
+set public = excluded.public,
+    file_size_limit = excluded.file_size_limit,
+    allowed_mime_types = excluded.allowed_mime_types;
