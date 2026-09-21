@@ -11,8 +11,13 @@ RingVault is a WWE trading card collection tracker built from verified master ca
 - See progress by set and across the full catalogue
 - Back up and restore collection data
 - Installable, responsive and available offline after the first visit
+- Rights-aware card and sealed-product image support with lazy loading and placeholders
 
 Collection progress is currently stored in the browser. Account-based cloud sync, market pricing and photo recognition are planned phases.
+
+## Reference images
+
+The app loads approved card and sealed-product images from `data/images.json`. Until an asset is approved, RingVault displays a generated placeholder. See `docs/IMAGE_LIBRARY.md` for the Supabase storage layout, rights register and bulk-manifest workflow.
 
 ## Run locally
 
