@@ -49,6 +49,15 @@ python scripts/build_image_manifest.py \
 
 ## Supabase setup
 
+Active hosted project:
+
+- Name: `RingVault Sydney`
+- Region: Sydney (`ap-southeast-2`)
+- Project reference: `jvsvuxgpaqwlcstfuzbd`
+- Public reference-image base URL: `https://jvsvuxgpaqwlcstfuzbd.supabase.co/storage/v1/object/public/reference-images`
+
+Setup steps for rebuilding the backend:
+
 1. Create a separate RingVault Supabase project.
 2. Create a public bucket named `reference-images` with JPEG, PNG and WebP MIME types only.
 3. Apply `supabase/migrations/202609210001_reference_images.sql`.
