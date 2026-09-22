@@ -85,7 +85,7 @@ def main():
 
     sets, subsets, cards, rules, variants, sources = [], [], [], [], [], []
     static_sets, static_cards = [], []
-    seen_cards, seen_variants = set(), set()
+    seen_cards, seen_variants, seen_subsets = set(), set(), set()
 
     for relative_path, set_id, set_name, short_name, accent in SET_CONFIG:
         path = args.source_root / relative_path
@@ -106,6 +106,10 @@ def main():
         static_subsets = []
         subset_names = {}
         for row in subset_rows:
+            subset_key = (set_id, str(row["Subset Code"]))
+            if subset_key in seen_subsets:
+                raise ValueError(f"Duplicate subset key: {subset_key[0]} / {subset_key[1]}")
+            seen_subsets.add(subset_key)
             subset = {
                 "set_id": set_id, "subset_code": str(row["Subset Code"]), "category": row.get("Category"),
                 "name": row.get("Subset"), "card_count": as_int(row.get("Card Count")),
@@ -120,6 +124,9 @@ def main():
             if card_id in seen_cards:
                 raise ValueError(f"Duplicate card UID: {card_id}")
             seen_cards.add(card_id)
+            subset_key = (set_id, str(row["Subset Code"]))
+            if subset_key not in seen_subsets:
+                raise ValueError(f"Card {card_id} references missing subset: {subset_key[0]} / {subset_key[1]}")
             card = {
                 "id": card_id, "set_id": set_id, "checklist_order": int(row["Checklist Order"]),
                 "category": row.get("Category"), "subset_code": str(row["Subset Code"]),
