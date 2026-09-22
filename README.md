@@ -4,7 +4,7 @@ RingVault is a WWE trading card collection tracker built from verified master ca
 
 ## MVP features
 
-- Browse 7,543 card identities across 16 completed WWE sets
+- Browse 7,566 card identities across 16 completed WWE sets
 - Search by wrestler, card number, subset, code or roster
 - Filter by set, category and collection status
 - Mark cards as owned or wanted
