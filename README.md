@@ -4,7 +4,7 @@ RingVault is a WWE trading card collection tracker built from verified master ca
 
 ## MVP features
 
-- Browse 2,467 card identities across six completed WWE sets
+- Browse 7,543 card identities across 16 completed WWE sets
 - Search by wrestler, card number, subset, code or roster
 - Filter by set, category and collection status
 - Mark cards as owned or wanted
@@ -44,8 +44,18 @@ The generated app dataset currently includes:
 - 2025 Topps Chrome WWE x Cactus Jack
 - 2025 Topps Chrome WWE Cactus Jack x WrestleMania
 - 2025 Topps Chrome Sapphire WWE
+- 2025 Topps John Cena Commemorative Collection
+- 2025 Topps Exalted WWE
+- 2026 Topps Chrome WWE
+- 2026 Topps Now WrestleMania Vegas
+- 2026 Topps Chrome LogoFractor WWE
+- 2025 Topps Royalty WWE
+- 2026 Topps Chrome Sapphire WWE
+- 2026 Topps Cosmic Chrome WWE
+- 2026 Topps Decades WWE - '90s Edition
+- 2026 Topps Universe WWE
 
-Run `scripts/build_catalogue.py` after placing the completed spreadsheets in the configured source folder to rebuild `data/catalogue.json`.
+The ten post-Universe source workbooks and their original checklist files are stored under `sources/new_sets/`. Run `scripts/extract_new_catalogues.py` to re-normalize those checklists, then rebuild the workbooks and run `scripts/build_catalogue.py` to regenerate `data/catalogue.json` and the Supabase SQL batches.
 
 ## Authentication setup
 

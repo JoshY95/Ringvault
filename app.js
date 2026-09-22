@@ -373,6 +373,9 @@ async function fetchAllRows(table, columns, orderColumns) {
 }
 
 async function loadCatalogue() {
+  const offlineResponse = await fetch("data/catalogue.json");
+  if (!offlineResponse.ok) throw new Error("Catalogue failed to load");
+  const offlineCatalogue = await offlineResponse.json();
   if (state.supabase) {
     try {
       const [sets, subsets, cards] = await Promise.all([
@@ -381,7 +384,7 @@ async function loadCatalogue() {
         fetchAllRows("catalogue_cards", "id,set_id,checklist_order,card_number,display_name,subject_2,category,subset_code,roster,rookie,parallel_group", ["set_id", "checklist_order"]),
       ]);
       const subsetMap = new Map(subsets.map((subset) => [`${subset.set_id}\u0000${subset.subset_code}`, subset.name]));
-      return {
+      const remoteCatalogue = {
         schemaVersion: 2,
         setCount: sets.length,
         cardCount: cards.length,
@@ -396,13 +399,13 @@ async function loadCatalogue() {
           subsetCode: card.subset_code, roster: card.roster, rookie: card.rookie ? "Yes" : "No", parallelGroup: card.parallel_group,
         })),
       };
+      if (remoteCatalogue.cardCount >= offlineCatalogue.cardCount) return remoteCatalogue;
+      console.warn(`Supabase catalogue has ${remoteCatalogue.cardCount} cards; using the newer ${offlineCatalogue.cardCount}-card bundled catalogue.`);
     } catch (error) {
       console.warn("Supabase catalogue unavailable; using offline catalogue.", error);
     }
   }
-  const response = await fetch("data/catalogue.json");
-  if (!response.ok) throw new Error("Catalogue failed to load");
-  return response.json();
+  return offlineCatalogue;
 }
 
 function remoteRowToEntry(row) {

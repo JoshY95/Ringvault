@@ -1,4 +1,4 @@
-const CACHE = "ringvault-v5";
+const CACHE = "ringvault-v6";
 const ASSETS = ["./", "index.html", "styles.css", "config.js", "app.js", "manifest.json", "data/catalogue.json", "data/images.json"];
 
 self.addEventListener("install", (event) => event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting())));
