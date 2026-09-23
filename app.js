@@ -47,15 +47,19 @@ function mergeLocalCollections(primary, incoming) {
 
 function migrateLegacyCollectionIds() {
   const replacements = [
-    ["2025-TCWWE-CJ-BASE-", "2025-TCWWE-CJWM-BASE-"],
     ["2025-WMCJ-CCA-", "2025-TCWWE-CJWM-CCA-"],
     ["2025-WMCJ-CJA-", "2025-TCWWE-CJWM-AUTO-"],
   ];
+  const validCardIds = new Set((state.catalogue?.cards || []).map((card) => card.id));
   let changed = false;
   for (const [oldId, entry] of Object.entries({ ...state.collection })) {
+    // Never migrate a current canonical ID. This prevents similarly named sets
+    // from sharing collection state when a historical prefix is reused.
+    if (validCardIds.has(oldId)) continue;
     const replacement = replacements.find(([prefix]) => oldId.startsWith(prefix));
     if (!replacement) continue;
     const newId = replacement[1] + oldId.slice(replacement[0].length);
+    if (!validCardIds.has(newId)) continue;
     if (!state.collection[newId] || new Date(entry.updatedAt || 0) > new Date(state.collection[newId].updatedAt || 0)) state.collection[newId] = entry;
     delete state.collection[oldId];
     changed = true;
