@@ -104,6 +104,12 @@ function setOwnedCount(setId) {
   return state.catalogue.cards.filter((card) => card.setId === setId && statusFor(card.id) === "owned").length;
 }
 
+function formatPercentage(value, total) {
+  if (!total || value <= 0) return "0%";
+  if (value >= total) return "100%";
+  return `${((value / total) * 100).toFixed(2)}%`;
+}
+
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[character]);
 }
@@ -133,22 +139,23 @@ function imageMarkup(entry, alt, fallback, className = "") {
 
 function setCard(set) {
   const owned = setOwnedCount(set.id);
-  const progress = set.cardCount ? Math.round((owned / set.cardCount) * 100) : 0;
+  const progress = set.cardCount ? (owned / set.cardCount) * 100 : 0;
+  const progressLabel = formatPercentage(owned, set.cardCount);
   return `<article class="set-card" data-set-id="${set.id}" style="--accent:${set.accent}">
     ${imageMarkup(setImage(set.id), `${set.name} sealed product`, "BOX", "set-image")}
     <span class="set-year">${set.year} · ${escapeHtml(set.manufacturer)}</span>
     <h3>${escapeHtml(set.shortName)}</h3>
     <div class="set-meta">${set.cardCount.toLocaleString()} cards · ${set.subsetCount} subsets</div>
     <div class="progress-track"><div class="progress-fill" style="--progress:${progress}%"></div></div>
-    <div class="progress-label"><span>${owned.toLocaleString()} collected</span><strong>${progress}%</strong></div>
+    <div class="progress-label"><span>${owned.toLocaleString()} collected</span><strong>${progressLabel}</strong></div>
   </article>`;
 }
 
 function renderStats() {
   const { owned, wanted } = counts();
-  const completion = state.catalogue.cardCount ? ((owned / state.catalogue.cardCount) * 100).toFixed(1) : "0.0";
+  const completion = formatPercentage(owned, state.catalogue.cardCount);
   $("#stats").innerHTML = [
-    ["Cards owned", owned.toLocaleString(), `${completion}% of catalogued cards`],
+    ["Cards owned", owned.toLocaleString(), `${completion} of catalogued cards`],
     ["Wanted cards", wanted.toLocaleString(), "Your active chase list"],
     ["Completed sets", state.catalogue.sets.filter((set) => setOwnedCount(set.id) === set.cardCount).length, `of ${state.catalogue.setCount} available`],
     ["Cards catalogued", state.catalogue.cardCount.toLocaleString(), "Verified master identities"],
